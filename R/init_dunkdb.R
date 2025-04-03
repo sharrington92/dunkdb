@@ -23,8 +23,9 @@ init_dunkdb <- function(path = getwd(), db_name = "dunkdb.ddb"){
 
 
   # Create database tables
-  create_tables()
+  create_tables(con)
 
   # Create database functions
 
+  return(con)
 }
