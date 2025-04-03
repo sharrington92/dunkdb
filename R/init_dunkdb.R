@@ -4,6 +4,9 @@
 #' *dunkdb*() creates a DuckDB database and the necessary database objects
 #' to store NCAA men's basketball data in a normalized relational model.
 #'
+#' @param path File path for database location.
+#' @param db_name Name of DuckDB database.
+#'
 #' @returns A DuckDB database connection.
 #' @export
 #'

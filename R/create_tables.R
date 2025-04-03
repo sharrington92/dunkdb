@@ -1,5 +1,7 @@
 #' Create DunkDB Database Tables
 #'
+#' @param con A DBI database connection object to the dunkdb DuckDB database.
+#'
 #' @returns N/A. Executes SQL to create database table.
 #'
 create_tables <- function(con){

@@ -1,5 +1,7 @@
 #' Create DunkDB Table: event_tags dimension
 #'
+#' @param con A DBI database connection object to the dunkdb DuckDB database.
+#'
 #' @returns N/A. Executes SQL to create database table.
 #'
 create_table_event_tags <- function(con){
