@@ -10,8 +10,13 @@
 init_dunkdb <- function(path = getwd(), db_name = "dunkdb.ddb"){
 
   # Create DuckDB Instance if needed
+  ddb <- duckdb::duckdb(
+    dbdir = file.path(path, db_name),
+    read_only = FALSE
+  )
 
   # Connect to DB Instance
+  con <- DBI::dbConnect(ddb)
 
 
   # Create database tables
