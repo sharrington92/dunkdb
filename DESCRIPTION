@@ -2,8 +2,8 @@ Package: dunkdb
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Shaun", "Harrington", , "harrington-shaun@outlook.com", role = c("aut", "cre"))
+Description: Dunkdb creates a relational data model in DuckDB for NCAA basketball data.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
