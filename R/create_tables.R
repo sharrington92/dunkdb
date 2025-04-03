@@ -10,15 +10,15 @@ create_tables <- function(con){
   create_table_schools(con)
   create_table_seasons(con)
   create_table_conferences(con)
+  create_table_coaches(con)
   create_table_teams(con)
   create_table_rosters(con)
   create_table_players(con)
-  create_table_coaches(con)
   create_table_games(con)
   create_table_boxscores(con)
-  create_table_event_tags(con)
   create_table_events(con)
   create_table_events_mapping(con)
+  create_table_event_tags(con)
   create_table_pbp(con)
 
 }
@@ -96,86 +96,6 @@ create_table_conferences <- function(con){
 
 }
 
-#' Create DunkDB Table: event_tags dimension
-#'
-#' @param con A DBI database connection object to the dunkdb DuckDB database.
-#'
-#' @returns N/A. Executes SQL to create database table.
-#'
-create_table_event_tags <- function(con){
-
-  DBI::dbExecute(
-    con,
-    "CREATE OR REPLACE TABLE event_tags AS
-      WITH step1 AS (
-      	SELECT
-      		STRUCT_EXTRACT(tag_struct, 'unnest') AS tag
-      	FROM staging_events
-      	CROSS JOIN UNNEST(split(event_tags, ';')) AS tag_struct
-      	WHERE
-      		event_tags IS NOT NULL
-      		AND TRIM(event_tags) != ''
-      )
-      SELECT DISTINCT
-      	tag
-      FROM step1
-      WHERE
-      	tag != ''
-      ORDER BY tag;"
-  )
-
-}
-
-
-#' Create DunkDB Table: events_mapping dimension
-#'
-#' @param con A DBI database connection object to the dunkdb DuckDB database.
-#'
-#' @returns N/A. Executes SQL to create database table.
-#'
-create_table_events_mapping <- function(con){
-
-  DBI::dbExecute(
-    con,
-    "CREATE OR REPLACE TABLE events_map AS
-    WITH
-    clean_events AS (
-    	SELECT
-    		event AS event_raw,
-    		clean_staging_event(event) AS event,
-    		COUNT() AS n,
-    		COUNT(DISTINCT game_id) AS game_n
-    	FROM staging_events
-    	WHERE
-    		event NOT LIKE '%,%'
-    		AND event NOT LIKE '%;%'
-    		AND event NOT LIKE '%  %'
-    	GROUP BY ALL
-    	HAVING game_n > 1
-    ), event_sim AS (
-    	SELECT
-    		event_raw,
-    		a.event AS event_clean,
-    		b.event,
-    		jaccard(a.event, b.event) AS similarity_jaccard,
-    		damerau_levenshtein(a.event, b.event) AS similar_damer,
-    		game_n
-    	FROM clean_events a, events b
-    	WINDOW
-    		event_window AS (PARTITION BY event_raw ORDER BY similar_damer, similarity_jaccard DESC)
-    	QUALIFY
-    		row_number() OVER event_window <= 1
-    )
-    SELECT DISTINCT
-    	event_raw,
-    	event
-    FROM
-    	event_sim
-    ORDER BY event, event_raw;"
-  )
-
-}
-
 
 #' Create DunkDB Table: events dimension
 #'
@@ -195,6 +115,44 @@ create_table_events <- function(con){
     	event_desc TEXT,
 
     	UNIQUE(event)
+    );"
+  )
+
+}
+
+#' Create DunkDB Table: event_tags dimension
+#'
+#' @param con A DBI database connection object to the dunkdb DuckDB database.
+#'
+#' @returns N/A. Executes SQL to create database table.
+#'
+create_table_event_tags <- function(con){
+
+  DBI::dbExecute(
+    con,
+    "CREATE TABLE IF NOT EXISTS event_tags (
+      tag TEXT PRIMARY KEY
+    );"
+  )
+
+}
+
+
+#' Create DunkDB Table: events_mapping dimension
+#'
+#' @param con A DBI database connection object to the dunkdb DuckDB database.
+#'
+#' @returns N/A. Executes SQL to create database table.
+#'
+create_table_events_mapping <- function(con){
+
+  DBI::dbExecute(
+    con,
+    "CREATE TABLE IF NOT EXISTS events_map (
+      event_raw TEXT,
+    	event TEXT,
+
+    	UNIQUE(event_raw)
     );"
   )
 
