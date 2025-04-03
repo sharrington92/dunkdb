@@ -4,8 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Shaun", "Harrington", , "harrington-shaun@outlook.com", role = c("aut", "cre"))
 Description: Dunkdb creates a relational data model in DuckDB for NCAA basketball data.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
