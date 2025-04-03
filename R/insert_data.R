@@ -11,10 +11,18 @@
 #'
 insert_data <- function(con){
 
+  populate_name_mapping(con)
+
 }
 
 
 #' Populate name_mapping table
+#'
+#' @description
+#' Inserts a name-to-nickname [table](https://github.com/carltonnorthern/nicknames/raw/refs/heads/master/names.csv)
+#' into database. This is for standardizing player names as play-by-play data
+#' does not consistently use same first name.
+#'
 #'
 #' @param con A database connection to DunkDB database.
 #'
@@ -33,6 +41,12 @@ populate_name_mapping <- function(con){
   		'https://github.com/carltonnorthern/nicknames/raw/refs/heads/master/names.csv',
   		header = FALSE,
   		names = ['name_row']
-  	   );"
+  	   );
+    INSERT INTO name_mapping
+    	VALUES
+    		('corey', 'cory'),
+    		('cory', 'corey')
+    	ON CONFLICT DO NOTHING;
+    "
     )
 }
