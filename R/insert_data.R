@@ -12,6 +12,7 @@
 insert_data <- function(con){
 
   populate_name_mapping(con)
+  populate_seasons(con)
 
 }
 
@@ -50,4 +51,56 @@ populate_name_mapping <- function(con){
     	ON CONFLICT DO NOTHING;
     "
     )
+}
+
+
+#' Insert Data for seasons Dimensional Table
+#'
+#' @param con Dunkdb database connection
+#'
+#' @returns N/A
+#'
+populate_seasons <- function(con){
+
+
+  # Get any team page
+  u <- "https://stats.ncaa.org/teams/560624"
+
+  # Form request
+  req <- httr2::request(u) |>
+    httr2::req_headers(`User-Agent` = "My Custom User Agent")
+
+  # Get response
+  resp <- req |>
+    httr2::req_perform() |>
+    httr2::resp_body_string()
+
+  # Parse html
+  parsed.html <- rvest::read_html(resp)
+
+  # Select the <select> element with id "year_list"
+  year_select <- rvest::html_node(parsed.html, "select#year_list")
+
+  # Extract all <option> nodes within the selected <select>
+  option_nodes <- rvest::html_nodes(year_select, "option")
+
+  # Extract the 'value' attributes
+  season.ids <- rvest::html_attr(option_nodes, "value")
+
+  # Extract the text labels and trim any leading/trailing whitespace
+  seasons <- rvest::html_text(option_nodes) |> trimws()
+
+  season <- NULL
+
+  d <- dplyr::tibble(
+    season_id = as.integer(season.ids),
+    season = seasons,
+    academic_year = as.numeric(stringr::str_sub(season, 1, 4)) + 1,
+    ncaa_id = TRUE
+  )
+
+  DBI::dbWriteTable(con, "#seasons", d, temporary = TRUE, overwrite = TRUE)
+
+  db_temp_to_perm(con, "#seasons", "seasons", overwrite = TRUE)
+
 }
