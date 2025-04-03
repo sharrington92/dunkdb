@@ -23,7 +23,7 @@ init_dunkdb <- function(path = getwd(), db_name = "dunkdb.ddb"){
 
 
   # Load DuckDB Packages
-  dbExecute(
+  DBI::dbExecute(
     con,
     "
     INSTALL httpfs;
