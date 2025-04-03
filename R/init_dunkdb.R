@@ -4,10 +4,9 @@
 #' *dunkdb*() creates a DuckDB database and the necessary database objects
 #' to store NCAA men's basketball data in a normalized relational model.
 #'
-#' @returns
+#' @returns A DuckDB database connection.
 #' @export
 #'
-#' @examples
 init_dunkdb <- function(path = getwd(), db_name = "dunkdb.ddb"){
 
   # Create DuckDB Instance if needed
