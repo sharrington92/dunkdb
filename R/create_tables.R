@@ -218,7 +218,7 @@ create_table_pbp <- function(con){
 
   DBI::dbExecute(
     con,
-    "CREATE TABLE play_by_play (
+    "CREATE TABLE IF NOT EXISTS play_by_play (
     	game_id INT,
     	game_event_id INT,
     	period SMALLINT,
