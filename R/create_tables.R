@@ -419,3 +419,87 @@ create_table_teams <- function(con){
   )
 
 }
+
+
+#' Create DunkDB Staging Tables
+#'
+#' @param con A DBI database connection object to the dunkdb DuckDB database.
+#'
+#' @returns N/A. Executes SQL to create database table.
+#'
+create_tables_staging <- function(con){
+
+  DBI::dbExecute(
+    con,
+    "
+    CREATE TABLE IF NOT EXISTS staging_conf (
+      conf_id TEXT,
+      conf TEXT,
+      academic_year INT
+    );
+
+
+    CREATE TABLE IF NOT EXISTS staging_teams (
+      team_id TEXT,
+      season TEXT,
+      school_id TEXT,
+      coach_id TEXT,
+      conference TEXT,
+      division TEXT,
+      wins TEXT,
+      losses TEXT,
+      ties TEXT
+    );
+    -- This populates: coaches, teams
+
+
+    CREATE TABLE IF NOT EXISTS staging_rosters (
+      team_id INT,
+      player_id TEXT,
+      player_name TEXT,
+      games_played TEXT,
+      games_start TEXT,
+      jersey TEXT,
+      class TEXT,
+      position TEXT,
+      height TEXT,
+      hometown TEXT,
+      high_school TEXT
+    );
+    -- This populates: players, rosters
+
+
+    CREATE TABLE IF NOT EXISTS staging_games (
+      game_id TEXT,
+      box_id TEXT,
+      date DATE,
+      start_time TEXT,
+      home TEXT,
+      away TEXT,
+      home_score TEXT,
+      away_score TEXT,
+      attendance TEXT,
+      neutral_site TEXT,
+      home_win TEXT,
+      home_loss TEXT,
+      away_win TEXT,
+      away_loss TEXT
+    );
+
+
+    CREATE TABLE IF NOT EXISTS staging_pbp (
+      time TEXT,
+      event_team_away TEXT,
+      score TEXT,
+      event_team_home TEXT,
+      period TEXT,
+      team_home TEXT,
+      team_away TEXT,
+      game_id INT
+    );
+    "
+  )
+
+}
+
+
