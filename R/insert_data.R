@@ -32,8 +32,9 @@ populate_name_mapping <- function(con){
   DBI::dbExecute(
     con,
     "
+    LOAD httpfs;
     TRUNCATE TABLE name_mapping;
-    INSERT INTO TABLE name_mapping
+    INSERT INTO name_mapping
   	SELECT
   		REGEXP_EXTRACT(name_row, '^([A-z]+),(.*)$', 1) AS name,
   		REGEXP_SPLIT_TO_TABLE(name_row, ',') AS nickname
