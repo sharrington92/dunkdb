@@ -1,3 +1,5 @@
 ^dunkdb\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+\.ddb$
+\.ddb\.wal$
