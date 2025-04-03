@@ -22,6 +22,15 @@ init_dunkdb <- function(path = getwd(), db_name = "dunkdb.ddb"){
   con <- DBI::dbConnect(ddb)
 
 
+  # Load DuckDB Packages
+  dbExecute(
+    con,
+    "
+    INSTALL httpfs;
+    "
+  )
+
+
   # Create database tables
   create_tables(con)
 
