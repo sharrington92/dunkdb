@@ -7,7 +7,15 @@ create_table_players <- function(con){
 
   DBI::dbExecute(
     con,
-    ""
+    "CREATE TABLE IF NOT EXISTS players (
+      player_id INT PRIMARY KEY,
+      name TEXT,
+      name_last TEXT,
+      name_first TEXT,
+      suffix TEXT,
+      hometown TEXT,
+      high_school TEXT
+    )"
   )
 
 }
