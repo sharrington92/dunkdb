@@ -1,8 +1,7 @@
 #' Create DunkDB Table: rosters dimension
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_rosters <- function(con){
 
   DBI::dbExecute(

@@ -1,8 +1,7 @@
 #' Create DunkDB Table: teams dimension
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_teams <- function(con){
 
   DBI::dbExecute(

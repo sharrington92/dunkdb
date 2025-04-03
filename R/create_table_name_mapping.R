@@ -1,8 +1,7 @@
 #' Create DunkDB Table: name_mapping dimension
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_name_mapping <- function(con){
 
   DBI::dbExecute(

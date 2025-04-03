@@ -1,8 +1,7 @@
 #' Create DunkDB Table: event_tags dimension
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_event_tags <- function(con){
 
   DBI::dbExecute(

@@ -1,8 +1,7 @@
 #' Create DunkDB Table: events dimension
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_events <- function(con){
 
   DBI::dbExecute(

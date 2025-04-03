@@ -1,8 +1,7 @@
 #' Create DunkDB Table: play-by-play dimension
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_pbp <- function(con){
 
   DBI::dbExecute(

@@ -1,8 +1,7 @@
 #' Create DunkDB Table: games fact
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_games <- function(con){
 
   DBI::dbExecute(

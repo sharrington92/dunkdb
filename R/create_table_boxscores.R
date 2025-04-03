@@ -1,8 +1,7 @@
 #' Create DunkDB Table: boxscores fact
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_boxscores <- function(con){
 
   DBI::dbExecute(

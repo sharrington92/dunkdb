@@ -1,8 +1,7 @@
 #' Create DunkDB Table: schools dimension
 #'
-#' @returns
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_table_schools <- function(con){
 
   DBI::dbExecute(

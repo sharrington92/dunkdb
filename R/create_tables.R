@@ -1,11 +1,10 @@
 #' Create DunkDB Database Tables
 #'
-#' @returns
-#' @export
+#' @returns N/A. Executes SQL to create database table.
 #'
-#' @examples
 create_tables <- function(con){
 
+  create_table_name_mapping(con)
   create_table_schools(con)
   create_table_seasons(con)
   create_table_conferences(con)
@@ -19,6 +18,5 @@ create_tables <- function(con){
   create_table_events(con)
   create_table_events_mapping(con)
   create_table_pbp(con)
-  create_table_name_mapping(con)
 
 }
