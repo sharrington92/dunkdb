@@ -342,7 +342,8 @@ create_table_seasons <- function(con){
     "CREATE TABLE IF NOT EXISTS seasons (
       season_id INT PRIMARY KEY,
       season TEXT,
-      academic_year INT
+      academic_year INT,
+      ncaa_id BOOL
     )"
   )
 
