@@ -103,4 +103,18 @@ populate_seasons <- function(con){
 
   db_temp_to_perm(con, "#seasons", "seasons", overwrite = TRUE)
 
+
+  # Since seasons is only available from 1972,
+  # prior years will need to be generated with the ncaa_id flag set to false.
+  season_id <- NULL
+  dplyr::tibble(
+    season_id = 1890:1970,
+    season = paste0(
+      season_id, "-",
+      formatC((season_id + 1) %% 100, width = 2, flag = "0")
+    ),
+    academic_year = season_id,
+    ncaa_id = FALSE
+  ) %>%
+    DBI::dbAppendTable(con, "seasons", .)
 }
