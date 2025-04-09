@@ -22,3 +22,31 @@ db_temp_to_perm <- function(con, temp_name, perm_name, overwrite = FALSE){
     )
   )
 }
+
+
+#' Print Status to Console
+#'
+#' @param text Statement to print to console
+#' @param status One of: start, done
+#'
+#' @returns N/A. Sends statement to console
+#'
+#' @examples
+#' status_out("Test start", "start")
+#' status_out("Test complete", "done")
+status_out <- function(text, status, width = NULL, padded.char = "."){
+  out_color <- switch(status,
+                      "start" = "yellow2",
+                      "done" = "green1")
+
+  text_color <- crayon::style(text, out_color)
+  text_length <- crayon::col_nchar(text_color)
+
+  if(!is.null(width)) {
+    padded_text <- paste0(text, paste0(rep(".", width - text_length), collapse = ""))
+  } else {
+    padded_text <- text
+  }
+
+  cat(crayon::style(padded_text, out_color))
+}
