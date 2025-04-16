@@ -50,3 +50,34 @@ status_out <- function(text, status, width = NULL, padded.char = "."){
 
   cat(crayon::style(padded_text, out_color))
 }
+
+
+#' Delete All Data from DunkDB
+#'
+#' @param con A database connection.
+#' @param force When true, does not ask for confirmation.
+#'
+#' @returns
+#'
+truncate_db <- function(con, force = FALSE){
+
+  response <- NULL
+
+  if(!force){
+    response <- readline(prompt = cat(
+      " Are you sure you want to remove all data from DunkDB database?",
+      "(yes/no): "
+    ))
+    response <- tolower(response)
+  }
+
+  if(force | response %in% c("y", "yes")){
+
+    tbls <- dbListTables(con)
+
+    qrys <- paste("TRUNCATE TABLE", tbls, collapse = ";\n", sep = " ")
+
+    dbExecute(con, qrys)
+
+  }
+}
