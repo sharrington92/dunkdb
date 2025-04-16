@@ -83,3 +83,30 @@ truncate_db <- function(con, force = FALSE){
 
   }
 }
+
+
+#' Parse a URL
+#'
+#' @param .url URL as string.
+#'
+#' @returns Parsed HTML object.
+#'
+#' @examples
+#' parse_webpage("https://stats.ncaa.org/teams/history?utf8=%E2%9C%93&org_id=260&sport_code=MBB&commit=Search")
+parse_webpage <- function(.url){
+
+  # Form request
+  req <- httr2::request(.url) |>
+    httr2::req_headers(`User-Agent` = "My Custom User Agent")
+
+  # Get response
+  resp <- req |>
+    httr2::req_perform() |>
+    httr2::resp_body_string()
+
+  # Parse html
+  parsed.html <- resp |>
+    rvest::read_html()
+
+  return(parsed.html)
+}
