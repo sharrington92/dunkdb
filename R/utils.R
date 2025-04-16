@@ -26,8 +26,10 @@ db_temp_to_perm <- function(con, temp_name, perm_name, overwrite = FALSE){
 
 #' Print Status to Console
 #'
-#' @param text Statement to print to console
-#' @param status One of: start, done
+#' @param text Statement to print to console.
+#' @param status One of: start, done.
+#' @param width Character width of output. NULL for no padding.
+#' @param padded.char Character value used to get to specified width.
 #'
 #' @returns N/A. Sends statement to console
 #'
@@ -57,7 +59,7 @@ status_out <- function(text, status, width = NULL, padded.char = "."){
 #' @param con A database connection.
 #' @param force When true, does not ask for confirmation.
 #'
-#' @returns
+#' @returns N/A. Sends 'TRUNCATE TABLE...' query to database for all tables.
 #'
 truncate_db <- function(con, force = FALSE){
 
