@@ -36,7 +36,7 @@ db_temp_to_perm <- function(con, temp_name, perm_name, overwrite = FALSE){
 #' @examples
 #' status_out("Test start", "start")
 #' status_out("Test complete", "done")
-status_out <- function(text, status, width = NULL, padded.char = "."){
+status_out <- function(text, status, width = 35, padded.char = "."){
   out_color <- switch(status,
                       "start" = "yellow2",
                       "done" = "green1")

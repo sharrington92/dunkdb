@@ -11,8 +11,21 @@
 #'
 insert_data <- function(con){
 
+
   populate_name_mapping(con)
   populate_seasons(con)
+  populate_schools(con, .seasons)
+  populate_conferences(con, .seasons)
+  populate_teams(con, .seasons)
+  populate_coaches(con, .seasons, .teams)
+  populate_rosters(con, .seasons, .teams)
+  populate_players(con, .seasons, .teams)
+  populate_games(con, .seasons, .teams)
+  populate_boxscores(con, .seasons, .teams)
+  # populate_events(con)
+  # populate_events_mapping(con)
+  # populate_event_tags(con)
+  # populate_play_by_play(con, .games)
 
 }
 
@@ -30,6 +43,9 @@ insert_data <- function(con){
 #' @returns N/A
 #'
 populate_name_mapping <- function(con){
+
+  status_out("\n\nPopulating names_mapping...", "start")
+
   DBI::dbExecute(
     con,
     "
@@ -51,6 +67,8 @@ populate_name_mapping <- function(con){
     	ON CONFLICT DO NOTHING;
     "
     )
+
+  status_out("Complete", "done", width = NULL)
 }
 
 
@@ -62,6 +80,7 @@ populate_name_mapping <- function(con){
 #'
 populate_seasons <- function(con){
 
+  status_out("\nPopulating seasons...", "start")
 
   # Get any team page
   u <- "https://stats.ncaa.org/teams/560624"
@@ -117,4 +136,22 @@ populate_seasons <- function(con){
     ncaa_id = FALSE
   ) %>%
     DBI::dbAppendTable(con, "seasons", .)
+
+  status_out("Complete", "done", width = NULL)
+}
+
+
+#' Insert Data for seasons Dimensional Table
+#'
+#' @param con Dunkdb database connection
+#'
+#' @returns N/A
+#'
+populate_schools <- function(con){
+
+  status_out("\nPopulating schools...", "start")
+
+
+
+  status_out("Complete", "done", width = NULL)
 }
