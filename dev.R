@@ -30,20 +30,78 @@ use_package("crayon")
   insert_data(con)
 
 
+}
+
+
+{
+  library(ncaahoopR)
+
+  # Not up-to-date
+  ncaahoopR::conf %>% as_tibble() #%>% filter(str_detect(sref_name, "Gonzaga"))
+
+  # Seems up-to-date
+  ncaahoopR::dict %>% as_tibble() #%>% filter(str_detect(NCAA, "Utah Tech"))
+
+  # ncaahoopR::wp_hoops %>% as_tibble()
+
+  ncaahoopR::ids %>% as_tibble()
+
+  ncaahoopR::ncaa_colors %>% as_tibble()
+
   {
-    status_out("\nPopulating names_mapping...", "start", width = 35)
-    Sys.sleep(.5)
-    status_out(" Complete", "done")
+    df.schools |>
+      inner_join(y = ncaa_colors, join_by(ncaa_name)) |>
+      select(school_id, ncaa_name, espn_name)
 
-    status_out("\nPopulating seasons...", "start", width = 35)
-    Sys.sleep(.5)
-    status_out(" Complete", "done")
+    df.schools |>
+      anti_join(y = ncaa_colors, join_by(ncaa_name)) |>
+      select(school_id, ncaa_name) |>
+      # 0 matches
+      # inner_join(y = ncaa_colors, join_by(ncaa_name == espn_name))
+      # 0 matches
+      # inner_join(y = ncaahoopR::ids, join_by(ncaa_name == team))
+      # 1 match
+      inner_join(y = ncaahoopR::ids, join_by(ncaa_name == espn_abbrv)) |>
+      select(school_id, ncaa_name)
 
+    df.schools |>
+      anti_join(y = ncaa_colors, join_by(ncaa_name)) |>
+      select(school_id, ncaa_name) |>
+      # 0 matches
+      # inner_join(y = ncaa_colors, join_by(ncaa_name == espn_name))
+      # 0 matches
+      # inner_join(y = ncaahoopR::ids, join_by(ncaa_name == team))
+      # 1 match
+      anti_join(y = ncaahoopR::ids, join_by(ncaa_name == espn_abbrv)) |>
+      select(school_id, ncaa_name) |>
+      inner_join(y = ncaahoopR::dict, join_by(ncaa_name == Trank))
+
+    colnames(ncaahoopR::dict)
+
+    df.schools |>
+      inner_join(y = ncaa_colors, join_by(ncaa_name == espn_name))
+
+
+    df.schools |>
+      inner_join(y = ncaahoopR::dict, join_by(ncaa_name == NCAA))
+    df.schools |>
+      inner_join(y = ncaahoopR::dict, join_by(ncaa_name == name_247))
   }
 
-  crayon::col_nchar("\nPopulating names_mapping...")
-  nchar("\nPopulating names_mapping...")
+  {
+
+
+
+
+
+
+
+
+  }
 }
+
+
+truncate_db(con, force = FALSE)
 
 dbDisconnect(con)
 rm(con)
