@@ -14,14 +14,14 @@ insert_data <- function(con){
 
   populate_name_mapping(con)
   populate_seasons(con)
-  populate_schools(con, .seasons)
-  populate_conferences(con, .seasons)
-  populate_teams(con, .seasons)
-  populate_coaches(con, .seasons, .teams)
-  populate_rosters(con, .seasons, .teams)
-  populate_players(con, .seasons, .teams)
-  populate_games(con, .seasons, .teams)
-  populate_boxscores(con, .seasons, .teams)
+  # populate_schools(con, .seasons)
+  # populate_conferences(con, .seasons)
+  # populate_teams(con, .seasons)
+  # populate_coaches(con, .seasons, .teams)
+  # populate_rosters(con, .seasons, .teams)
+  # populate_players(con, .seasons, .teams)
+  # populate_games(con, .seasons, .teams)
+  # populate_boxscores(con, .seasons, .teams)
   # populate_events(con)
   # populate_events_mapping(con)
   # populate_event_tags(con)
@@ -198,13 +198,13 @@ populate_schools <- function(con){
   # Create list of tables with school names
   school.tables <- list(
     df.schools,
-    ncaa_colors |> select(ncaa_name, espn_name),
-    ncaahoopR::ids |> select(team, espn_abbrv),
-    ncaahoopR::dict |> select(-conference)
+    ncaa_colors |> dplyr::select(ncaa_name, espn_name),
+    ncaahoopR::ids |> dplyr::select(team, espn_abbrv),
+    ncaahoopR::dict |> dplyr::select(-conference)
   )
 
   # Iterate through each dataset creating inner and anti joins
-  # with each column to get a accumulating match from the scraped names
+  # with each column to get an accumulating match from the scraped names
   # with those in ncaahoopR package.
   joins <- list()
   index <- 1
@@ -213,27 +213,27 @@ populate_schools <- function(con){
     for(i in seq_along(colnames(df))){
       if(index == 1){
         joins[[index]] <- school.tables[[1]] |>
-          select(school_id, ncaa_name) |>
-          inner_join(
+          dplyr::select(school_id, ncaa_name) |>
+          dplyr::inner_join(
             df,
-            join_by(ncaa_name == !!sym(colnames(df)[i]))
+            dplyr::join_by(ncaa_name == !!rlang::sym(colnames(df)[i]))
           )
       } else if(i == 1){
-        joins[[index]] <- do.call(bind_rows, joins) |>
-          select(school_id, ncaa_name) |>
-          inner_join(
+        joins[[index]] <- do.call(dplyr::bind_rows, joins) |>
+          dplyr::select(school_id, ncaa_name) |>
+          dplyr::inner_join(
             df,
-            join_by(ncaa_name == !!sym(colnames(df)[i]))
+            dplyr::join_by(ncaa_name == !!rlang::sym(colnames(df)[i]))
           )
       } else{
         joins[[index]] <-
           # joins[[index-1]] |>
           do.call(bind_rows, joins) |>
-          select(school_id, ncaa_name) |>
-          anti_join(df, join_by(ncaa_name == !!sym(colnames(df)[i-1]))) |>
-          inner_join(
+          dplyr::select(school_id, ncaa_name) |>
+          dplyr::anti_join(df, join_by(ncaa_name == !!rlang::sym(colnames(df)[i-1]))) |>
+          dplyr::inner_join(
             df,
-            join_by(ncaa_name == !!sym(colnames(df)[i]))
+            dplyr::join_by(ncaa_name == !!rlang::sym(colnames(df)[i]))
           )
       }
       index = index + 1
@@ -241,14 +241,14 @@ populate_schools <- function(con){
   }
 
   # Bind joins together, and get distinct matches for each scraped name
-  joins.df <- do.call(bind_rows, purrr::discard(joins, ~nrow(.x) == 0)) |>
-    distinct() |>
+  joins.df <- do.call(dplyr::bind_rows, purrr::discard(joins, ~nrow(.x) == 0)) |>
+    dplyr::distinct() |>
     tidyr::pivot_longer(-c(school_id, ncaa_name), values_drop_na = TRUE) |>
-    distinct() |>
+    dplyr::distinct() |>
     tidyr::pivot_wider(names_from = name, values_from = value)
 
-  # ncaahoopR::ids # espn ids
-  # ncaahoopR::conf # conferences
+
+
 
 
 
