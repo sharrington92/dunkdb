@@ -34,7 +34,7 @@ create_table_boxscores <- function(con){
 
   DBI::dbExecute(
     con,
-    "CREATE TABLE IF NOT EXISTS box (
+    "CREATE TABLE IF NOT EXISTS boxscores (
       game_id INT,
       player_id INT,
       tech INT,
