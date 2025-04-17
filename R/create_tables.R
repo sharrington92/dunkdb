@@ -312,17 +312,40 @@ create_table_schools <- function(con){
       school_id INT PRIMARY KEY,
       espn_id INT,
       ncaa_name TEXT,
-      espn_name TEXT,
-      espn_abbrv TEXT,
-      primary_color TEXT,
-      secondary_color TEXT,
-      tertiary_color TEXT,
-      color_4 TEXT,
-      color_5 TEXT,
-      color_6 TEXT,
-      logo_url TEXT,
-  	espn_link TEXT
-    )
+      city TEXT,
+      state TEXT,
+      mascot TEXT,
+      established_year SMALLINT
+    );
+
+    CREATE SEQUENCE IF NOT EXISTS alias_id_seq START 1;
+    CREATE TABLE IF NOT EXISTS school_alias (
+      alias_id    BIGINT        DEFAULT nextval('alias_id_seq') PRIMARY KEY,
+      school_id   INT           NOT NULL,
+      source_id   INT,
+      source      VARCHAR(30)   NOT NULL,
+      alias_name  VARCHAR(100)  NOT NULL,
+      UNIQUE(school_id, source),
+      FOREIGN KEY (school_id) REFERENCES schools (school_id)
+    );
+
+    CREATE SEQUENCE IF NOT EXISTS color_id_seq START 1;
+    CREATE TABLE IF NOT EXISTS school_color (
+      color_id    BIGINT      DEFAULT nextval('color_id_seq') PRIMARY KEY,
+      school_id   INT         NOT NULL,
+      seq         SMALLINT    NOT NULL,
+      color_name  VARCHAR(30),
+      color_hex   CHAR(7),
+      UNIQUE(school_id, seq),
+      FOREIGN KEY (school_id) REFERENCES schools (school_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS school_logo (
+      school_id  INT         NOT NULL,
+      logo_type  VARCHAR(20),    -- 'primary', 'alternate', 'wordmark'
+      url        VARCHAR(255),
+      FOREIGN KEY (school_id) REFERENCES schools (school_id)
+    );
     "
   )
 
