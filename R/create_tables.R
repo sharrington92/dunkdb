@@ -312,6 +312,7 @@ create_table_schools <- function(con){
       school_id INT PRIMARY KEY,
       espn_id INT,
       ncaa_name TEXT,
+      espn_abbrv TEXT,
       city TEXT,
       state TEXT,
       mascot TEXT,
@@ -340,10 +341,10 @@ create_table_schools <- function(con){
       FOREIGN KEY (school_id) REFERENCES schools (school_id)
     );
 
-    CREATE TABLE IF NOT EXISTS school_logo (
-      school_id  INT         NOT NULL,
-      logo_type  VARCHAR(20),    -- 'primary', 'alternate', 'wordmark'
-      url        VARCHAR(255),
+    CREATE TABLE IF NOT EXISTS school_ref (
+      school_id   INT         NOT NULL,
+      value_type    VARCHAR(20),
+      value       VARCHAR(255),
       FOREIGN KEY (school_id) REFERENCES schools (school_id)
     );
     "
