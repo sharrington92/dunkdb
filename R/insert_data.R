@@ -14,7 +14,7 @@ insert_data <- function(con){
 
   populate_name_mapping(con)
   populate_seasons(con)
-  # populate_schools(con, .seasons)
+  populate_schools(con)
   # populate_conferences(con, .seasons)
   # populate_teams(con, .seasons)
   # populate_coaches(con, .seasons, .teams)
@@ -143,6 +143,13 @@ populate_seasons <- function(con){
 
 #' Insert Data for seasons Dimensional Table
 #'
+#' @description
+#' This function collects data about schools from stats.ncaa.org and joins
+#' it with various tables from the ncaahoopR package. These datasets are
+#' normalized and used to populate the schools, school_alias, school_color,
+#' and school_ref tables.
+#'
+#'
 #' @param con Dunkdb database connection
 #'
 #' @returns N/A
@@ -168,36 +175,15 @@ populate_schools <- function(con){
   # Extract the text labels and trim any leading/trailing whitespace
   schools <- html_text(option_nodes) %>% trimws()
 
-  df.schools <-
+  schools.scrape <-
     tibble(
       school_id = as.integer(school.ids)[-1],
       ncaa_name = schools[-1]
-    ) #%>%
-    # left_join(
-    #   y = ncaahoopR::ncaa_colors %>%
-    #     mutate(
-    #       ncaa_name = case_when(
-    #         ncaa_name == "Fairleigh Dickinson" ~ "FDU",
-    #         ncaa_name == "IUPUI" ~ "IU Indy",
-    #         ncaa_name == "Saint Francis (PA)" ~ "Saint Francis",
-    #         is.character(ncaa_name) ~ ncaa_name
-    #       )
-    #     ) %>%
-    #     left_join(
-    #       y = ncaahoopR::ids %>%
-    #         rename(
-    #           espn_id = id,
-    #           espn_link = link
-    #         ),
-    #       by = c("espn_name" = "team")
-    #     ),
-    #   by = "ncaa_name"
-    # ) %>%
-    # select(-c(color_3, conference))
+    )
 
-  # Create list of tables with school names
+  # Create list of tables with school names from ncaahoopR package
   school.tables <- list(
-    df.schools,
+    schools.scrape,
     ncaa_colors |> dplyr::select(ncaa_name, espn_name),
     ncaahoopR::ids |> dplyr::select(team, espn_abbrv),
     ncaahoopR::dict |> dplyr::select(-conference)
@@ -248,12 +234,100 @@ populate_schools <- function(con){
     tidyr::pivot_wider(names_from = name, values_from = value)
 
 
+  # df_no_match <- schools.scrape |>
+  #   dplyr::anti_join(
+  #     y = joins.df,
+  #     dplyr::join_by(ncaa_name)
+  #   )
+
+  df.together <- joins.df |>
+    dplyr::left_join(
+      y = ncaahoopR::ids |>
+        dplyr::select(id, team, link),
+      dplyr::join_by(espn_name == team)
+    ) |>
+    dplyr::left_join(
+      y = ncaahoopR::ncaa_colors,
+      dplyr::join_by(ncaa_name, espn_name)
+    ) |>
+    dplyr::rename(
+      espn_id = id
+    ) |>
+    dplyr::rename_with(tolower)
 
 
+  df.school <- df.together |>
+    dplyr::select(school_id, espn_id, ncaa_name, espn_abbrv)
+
+  df.school.alias_stage <- df.together |>
+    dplyr::select(
+      school_id, ncaa_name, espn_name, espn_pbp,
+      warren_nolan, trank, name_247, sref_name
+    ) |>
+    tidyr::pivot_longer(
+      -school_id,
+      names_to = "source", values_to = "alias_name",
+      values_drop_na = TRUE
+    ) |>
+    dplyr::mutate(source = stringr::str_replace(source, "_name", ""))
+
+  df.alias.source <-
+    df.school.alias_stage |>
+    dplyr::distinct(source) |>
+    dplyr::mutate(source_id = row_number()) |>
+    dplyr::relocate(source_id, .before = source)
+
+  df.school.alias <-
+    df.school.alias_stage |>
+    dplyr::left_join(
+      y = df.alias.source,
+      dplyr::join_by(source)
+    ) |>
+    dplyr::relocate(source_id, .before = source)
+
+  df.school.color <-
+    df.together |>
+    dplyr::select(school_id, dplyr::contains("color")) |>
+    dplyr::mutate(
+      color_3 = dplyr::coalesce(tertiary_color, color_3),
+      .keep = "unused"
+    ) |>
+    dplyr::rename(
+      color_1 = primary_color,
+      color_2 = secondary_color
+    ) |>
+    tidyr::pivot_longer(
+      -school_id,
+      names_to = "seq",
+      values_to = "color_hex",
+      names_prefix = "color_", names_transform = as.integer,
+      values_drop_na = TRUE
+    )
+
+  df.school.ref <-
+    df.together |>
+    dplyr::select(school_id, link, logo_url, sref_link) |>
+    dplyr::rename(espn_link = link) |>
+    tidyr::pivot_longer(
+      -school_id,
+      names_to = "value_type",
+      values_to = "value",
+      values_drop_na = TRUE
+    )
 
 
-  df.schools %>%
-    dbAppendTable(duck.con, "schools", .)
+  df.list <- list(
+    "schools" = df.school,
+    "school_alias" = df.school.alias,
+    "school_color" = df.school.color,
+    "school_ref" = df.school.ref
+  )
+
+  dbExecute(con, paste("TRUNCATE TABLE", rev(names(df.list)), collapse = ";\n"))
+
+  for(i in seq_along(df.list)){
+    dbAppendTable(con, names(df.list)[i], df.list[[i]], overwrite = TRUE)
+  }
 
   status_out("Complete", "done", width = NULL)
 }
